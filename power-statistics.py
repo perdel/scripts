@@ -3,8 +3,8 @@
 
 import time
 import datetime
-import sys
 import numpy as np
+import argparse
 import matplotlib.pyplot as plt
 
 
@@ -42,15 +42,28 @@ def analyse(fname: str, supply_price: float) -> None:
     plt.show()
 
 
-if __name__ == "__main__":
+def main():
     POWER_FILE = "/sys/class/power_supply/BAT0/power_now"
     OUTFILE = f"stats_{datetime.date.today().isoformat()}"
     SUPPLY_PRICE = 0.3189
 
-    if sys.argv[1] == "-m":
+    parser = argparse.ArgumentParser(
+        description="A program to measure or analyze battery power consumption."
+    )
+    parser.add_argument("-m", action="store_true", help="Call the measure function.")
+    parser.add_argument(
+        "-a", metavar="FILE", type=str, help="Call the analyze function with a file."
+    )
+
+    args = parser.parse_args()
+
+    if args.m:
         measure(power_file=POWER_FILE, out_file=OUTFILE)
-    elif sys.argv[1] == "-a":
-        analyse(fname=sys.argv[2], supply_price=SUPPLY_PRICE)
+    elif args.a:
+        analyse(fname=args.a, supply_price=SUPPLY_PRICE)
     else:
-        print("Unknown option")
-        sys.exit()
+        parser.print_help()
+
+
+if __name__ == "__main__":
+    main()
